@@ -1,4 +1,4 @@
-import { Button, H1, HTMLTable } from '@blueprintjs/core';
+import { Button, Card, H1, HTMLTable, Navbar } from '@blueprintjs/core';
 import { useCallback, useContext, useEffect, useMemo, useReducer } from 'react';
 import { GameContext, IGameContext, ITileContext, WorldMapContext } from '../data/models/Contexts';
 import { CountryNameKey } from '../data/models/GameMap';
@@ -21,8 +21,7 @@ const WorldMap = () => {
     let [state, dispatch] = useReducer(worldMapReducer, initialState);
 
     useEffect(() => {
-        dispatch({type:'LoadInitialState', initialState: initialState});
-        console.log("contextswitch");
+        dispatch({ type: 'LoadInitialState', initialState: initialState });
     }, [gameContext]);
 
     let applyArmies = (name: CountryNameKey, selectedArmies: number) => {
@@ -48,116 +47,126 @@ const WorldMap = () => {
     };
 
     return (
-        <div>
-            <H1>Current Turn: {state.currentTurn}</H1>
-            <WorldMapControlPanel selectedTerritory={state.selectedTerritory}
-                clearSelectedTerritory={clearSelectedTerritory} />
-            <HTMLTable>
-                <WorldMapContext.Provider value={propsToAddToEachTile}>
-                    <tbody className='waterTile'>
-                        <tr>
-                            <NamedTerritoryTile name="Alaska" />
-                            <NamedTerritoryTile name="NorthWesternTerritory" colSpan={2} />
-                            <td></td>
-                            <NamedTerritoryTile name="Greenland" />
-                            <td></td>
-                            <NamedTerritoryTile name="Scandinavia" />
-                            <NamedTerritoryTile name="Ukraine" rowSpan={3} />
-                            <NamedTerritoryTile name="Ural" rowSpan={2} />
-                            <NamedTerritoryTile name="Siberia" />
-                            <NamedTerritoryTile name="Yakutsk" />
-                            <NamedTerritoryTile name="Kamchatka" />
-                            <td></td>
-                        </tr>
-                        <tr>
-                            <td></td>
-                            <NamedTerritoryTile name="Alberta" />
-                            <NamedTerritoryTile name="Ontario" />
-                            <NamedTerritoryTile name="Quebec" />
-                            <td></td>
-                            <NamedTerritoryTile name="Iceland" />
-                            <NamedTerritoryTile name="NorthernEurope" rowSpan={2} />
-                            <NamedTerritoryTile name="Afghanistan" />
-                            <NamedTerritoryTile name="Irkutsk" />
-                            <td></td>
-                            <NamedTerritoryTile name="Japan" />
-                        </tr>
-                        <tr>
-                            <td></td>
-                            <NamedTerritoryTile name="WesternUS" />
-                            <NamedTerritoryTile name="EasternUS" />
-                            <td></td>
-                            <td></td>
-                            <NamedTerritoryTile name="GreatBritain" />
-                            <NamedTerritoryTile name="Mongolia" />
-                            <NamedTerritoryTile name="China" />
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                        </tr>
-                        <tr>
-                            <td></td>
-                            <NamedTerritoryTile name="CentralAmerica" />
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <NamedTerritoryTile name="WesternEurope" />
-                            <NamedTerritoryTile name="SouthernEurope" />
-                            <NamedTerritoryTile name="MiddleEast" />
-                            <NamedTerritoryTile name="Hindustan" />
-                            <NamedTerritoryTile name="Siam" />
-                            <td></td>
-                            <td></td>
-                        </tr>
-                        <tr>
-                            <td></td>
-                            <NamedTerritoryTile name="Venezuela" />
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <NamedTerritoryTile name="NorthAfrica" />
-                            <NamedTerritoryTile name="Egypt" />
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <NamedTerritoryTile name="Indonesia" />
-                            <NamedTerritoryTile name="NewGuinea" />
-                            <td></td>
-                        </tr>
-                        <tr>
-                            <NamedTerritoryTile name="Peru" />
-                            <NamedTerritoryTile name="Brazil" colSpan={2} />
-                            <td></td>
-                            <td></td>
-                            <NamedTerritoryTile name="Congo" />
-                            <NamedTerritoryTile name="EastAfrica" />
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <NamedTerritoryTile name="WesternAustralia" />
-                            <NamedTerritoryTile name="EasternAustralia" />
-                            <td></td>
-                        </tr>
-                        <tr>
-                            <td></td>
-                            <NamedTerritoryTile name="Argentina" />
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <NamedTerritoryTile name="SouthAfrica" />
-                            <NamedTerritoryTile name="Madagascar" />
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                        </tr>
-                    </tbody>
-                </WorldMapContext.Provider>
-            </HTMLTable>
-        </div>
+        <div className='fx-grd'>
+            <Navbar fixedToTop={true}> 
+
+            </Navbar>
+            <div className="row">
+                <div style={{width:150, position:"fixed", background:"#cdcdcd"}}>
+                    <Card>
+                        <strong>Current Turn: {state.currentTurn}</strong>
+                        <WorldMapControlPanel selectedTerritory={state.selectedTerritory}
+                            clearSelectedTerritory={clearSelectedTerritory} />
+
+                    </Card>
+                </div>
+                <div style={{overflow:"auto", marginLeft:150}}>
+                        <HTMLTable>
+                            <WorldMapContext.Provider value={propsToAddToEachTile}>
+                                <tbody className='waterTile'>
+                                    <tr>
+                                        <NamedTerritoryTile name="Alaska" />
+                                        <NamedTerritoryTile name="NorthWesternTerritory" colSpan={2} />
+                                        <td></td>
+                                        <NamedTerritoryTile name="Greenland" />
+                                        <td></td>
+                                        <NamedTerritoryTile name="Scandinavia" />
+                                        <NamedTerritoryTile name="Ukraine" rowSpan={3} />
+                                        <NamedTerritoryTile name="Ural" rowSpan={2} />
+                                        <NamedTerritoryTile name="Siberia" />
+                                        <NamedTerritoryTile name="Yakutsk" />
+                                        <NamedTerritoryTile name="Kamchatka" />
+                                        <td></td>
+                                    </tr>
+                                    <tr>
+                                        <td></td>
+                                        <NamedTerritoryTile name="Alberta" />
+                                        <NamedTerritoryTile name="Ontario" />
+                                        <NamedTerritoryTile name="Quebec" />
+                                        <td></td>
+                                        <NamedTerritoryTile name="Iceland" />
+                                        <NamedTerritoryTile name="NorthernEurope" rowSpan={2} />
+                                        <NamedTerritoryTile name="Afghanistan" />
+                                        <NamedTerritoryTile name="Irkutsk" />
+                                        <td></td>
+                                        <NamedTerritoryTile name="Japan" />
+                                    </tr>
+                                    <tr>
+                                        <td></td>
+                                        <NamedTerritoryTile name="WesternUS" />
+                                        <NamedTerritoryTile name="EasternUS" />
+                                        <td></td>
+                                        <td></td>
+                                        <NamedTerritoryTile name="GreatBritain" />
+                                        <NamedTerritoryTile name="Mongolia" />
+                                        <NamedTerritoryTile name="China" />
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                    </tr>
+                                    <tr>
+                                        <td></td>
+                                        <NamedTerritoryTile name="CentralAmerica" />
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <NamedTerritoryTile name="WesternEurope" />
+                                        <NamedTerritoryTile name="SouthernEurope" />
+                                        <NamedTerritoryTile name="MiddleEast" />
+                                        <NamedTerritoryTile name="Hindustan" />
+                                        <NamedTerritoryTile name="Siam" />
+                                        <td></td>
+                                        <td></td>
+                                    </tr>
+                                    <tr>
+                                        <td></td>
+                                        <NamedTerritoryTile name="Venezuela" />
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <NamedTerritoryTile name="NorthAfrica" />
+                                        <NamedTerritoryTile name="Egypt" />
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <NamedTerritoryTile name="Indonesia" />
+                                        <NamedTerritoryTile name="NewGuinea" />
+                                        <td></td>
+                                    </tr>
+                                    <tr>
+                                        <NamedTerritoryTile name="Peru" />
+                                        <NamedTerritoryTile name="Brazil" colSpan={2} />
+                                        <td></td>
+                                        <td></td>
+                                        <NamedTerritoryTile name="Congo" />
+                                        <NamedTerritoryTile name="EastAfrica" />
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <NamedTerritoryTile name="WesternAustralia" />
+                                        <NamedTerritoryTile name="EasternAustralia" />
+                                        <td></td>
+                                    </tr>
+                                    <tr>
+                                        <td></td>
+                                        <NamedTerritoryTile name="Argentina" />
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <NamedTerritoryTile name="SouthAfrica" />
+                                        <NamedTerritoryTile name="Madagascar" />
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                    </tr>
+                                </tbody>
+                            </WorldMapContext.Provider>
+                        </HTMLTable>
+                    </div></div></div>
     )
 };
 
@@ -227,7 +236,7 @@ function executeMovement(currentPositions: TerritoryState[], selectedTerritory: 
 let worldMapReducer = (state: IWorldMapState, action: IWorldMapAction) => {
     switch (action.type) {
         case 'LoadInitialState':
-            if(action.initialState)
+            if (action.initialState)
                 return action.initialState;
             break;
         case 'ClearSelection':
@@ -235,7 +244,7 @@ let worldMapReducer = (state: IWorldMapState, action: IWorldMapAction) => {
             return state;
         case 'SelectTile':
             if (!state.selectedTerritory && action.target)
-                return {...state, selectedTerritory: action.target  };
+                return { ...state, selectedTerritory: action.target };
             return state;
         case 'TargetTile':
             if (!state.selectedTerritory || !action.armiesToApply || !action.target)

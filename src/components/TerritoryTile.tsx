@@ -162,7 +162,7 @@ const TerritoryTile = (props: ITerritoryProps) => {
                     height={200 * (props.rowSpan ?? 1)}
                     width={250 * (props.colSpan ?? 1)}
                 >
-                    <div style={{ background: "#fff", width: 300 }}><Button onClick={click} intent={getButtonIntent()}
+                    <div style={{ background: "#fff" }}><Button onClick={click} intent={getButtonIntent()}
                         large={true} disabled={props.potentialActions === "None"}
                         style={{ opacity: 1 }} fill={true}>
                         {getButtonIcon()}&nbsp;
