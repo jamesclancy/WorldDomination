@@ -7,5 +7,7 @@ export function shuffle(array: any[]) : any[] {
 export function rollBattleDice(attackers: number, defenders: number)  : [number, number] {
     const attackerAdvantage = attackers - defenders;
     const outcome = Math.floor(Math.random() * attackerAdvantage);
+
+    console.log([attackers, defenders, attackerAdvantage, outcome]);
     return [Math.max(attackers - outcome, 0), Math.max(defenders - outcome, 0)];
 }

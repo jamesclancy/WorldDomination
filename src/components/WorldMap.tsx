@@ -1,271 +1,57 @@
-import { Button, H1, H5, HTMLTable, Icon, Intent, Slider, Tag } from '@blueprintjs/core';
-import { Popover2, Classes } from '@blueprintjs/popover2';
-import { useContext, useEffect, useState } from 'react';
+import { Button, H1, HTMLTable } from '@blueprintjs/core';
+import { useCallback, useContext, useEffect, useMemo, useReducer } from 'react';
 import { GameContext, IGameContext, ITileContext, WorldMapContext } from '../data/models/Contexts';
-import { Continent, CountryNameKey, Territory, TerritoryPotentialActions } from '../data/models/GameMap';
+import { CountryNameKey } from '../data/models/GameMap';
 import { TerritoryState } from '../data/models/GameState';
 import Player from '../data/models/Player';
-import { buildTerritoryPropsForTile, getTileClass } from '../data/models/Selectors';
 import { rollBattleDice } from '../utilities/Randomization';
-
-export interface ITerritoryProps {
-    applyArmy(selectedArmies: number): void;
-    potentialActions: TerritoryPotentialActions;
-    isTerritorySelected: boolean;
-    possibleArmiesToApply: number;
-    territory: Territory,
-    continent: Continent,
-    territoryState?: TerritoryState,
-    armies: number,
-    colSpan?: number,
-    rowSpan?: number,
-    select(): void
-}
-
-export interface INamedTerritoryTile {
-    name: CountryNameKey,
-    colSpan?: number,
-    rowSpan?: number
-}
-
-const NamedTerritoryTile = (props: INamedTerritoryTile) => {
-
-    let worldMapContext = useContext<ITileContext>(WorldMapContext);
-    let terPops = buildTerritoryPropsForTile(worldMapContext, props.name);
-
-    if (typeof terPops === "string") {
-
-        return (<td>{terPops}</td>);
-    }
-    return (
-        <TerritoryTile {...terPops} rowSpan={props.rowSpan} colSpan={props.colSpan}
-        />);
-};
-
-
-const TerritoryTile = (props: ITerritoryProps) => {
-
-    let [showPopover, setShowPopover] = useState(false);
-    let [selectedArmies, setSelectedArmies] = useState(props.possibleArmiesToApply);
-
-    const isSelected = props.isTerritorySelected;
-    const isClickable = props.potentialActions !== "None";
-
-    function click() {
-        if (isClickable)
-            props.select();
-    }
-
-    function applyArmies() {
-        togglePopover();
-        props.applyArmy(selectedArmies);
-    }
-
-    function togglePopover() {
-        setShowPopover(!showPopover);
-    }
-
-    function getButtonIcon() {
-        if (isSelected) {
-            return (<Icon icon="star" />);
-        }
-        switch (props.potentialActions) {
-            case 'Attack':
-                return (<Icon icon="locate" />);
-            case 'Move':
-                return (<Icon icon="flow-end" />);
-            case 'Select':
-                return (<Icon icon="map-marker" />);
-        }
-    };
-
-    function getButtonIntent(): Intent {
-        if (isSelected) {
-            return Intent.PRIMARY;
-        }
-        switch (props.potentialActions) {
-            case 'Attack':
-                return Intent.DANGER
-            case 'Move':
-                return Intent.WARNING;
-            case 'Select':
-                return Intent.SUCCESS;
-        }
-
-        return Intent.NONE;
-    };
-
-
-    let popOverContent = () => {
-        let slider = props.possibleArmiesToApply === 1 ?
-            (<><p>Are you sure you want to use your only spare army?</p></>)
-            : (<><p>Select armies to move.</p>
-                <Slider key="slider" 
-                min={1} 
-                max={props.possibleArmiesToApply} 
-                onChange={setSelectedArmies} 
-                value={selectedArmies} />
-            </>);
-
-        return (
-            <div className='popOverSelector'>
-                <H5>Confirm {props.potentialActions}</H5>
-                {slider}
-                <div style={{ display: "flex", justifyContent: "flex-end", marginTop: 15 }}>
-                    <Button className={Classes.POPOVER2_DISMISS} style={{ marginRight: 10 }} onClick={togglePopover}>
-                        Cancel
-                    </Button>
-                    <Button intent={Intent.DANGER} className={Classes.POPOVER2_DISMISS} onClick={applyArmies}>
-                        Confirm
-                    </Button>
-                </div>
-            </div>
-        );
-    };
-
-    switch (props.potentialActions) {
-        case 'Select':
-        case 'None':
-            return (
-                <td className={getTileClass(props.continent.name)}
-                    rowSpan={props.rowSpan ?? 1}
-                    colSpan={props.colSpan ?? 1}
-                    height={200 * (props.rowSpan ?? 1)}
-                    width={250 * (props.colSpan ?? 1)}
-                >
-                    <div style={{ background: "#fff", width: 300 }}><Button onClick={click} intent={getButtonIntent()}
-                        large={true} disabled={props.potentialActions === "None"}
-                        style={{ opacity: 1 }} fill={true}>
-                        {getButtonIcon()}&nbsp;
-                        {props.territory.displayText} &nbsp;
-                        <Tag large={true}>{props.armies}</Tag>
-                    </Button></div>
-                </td>
-            );
-    }
-
-    return (
-        <td className={getTileClass(props.continent.name)}
-            rowSpan={props.rowSpan ?? 1}
-            colSpan={props.colSpan ?? 1}
-            height={200 * (props.rowSpan ?? 1)}
-            width={250 * (props.colSpan ?? 1)}
-        >
-            <Popover2
-                enforceFocus={true}
-                isOpen={showPopover}
-                content={popOverContent()}
-            >
-                <div style={{ background: "#fff", width: 300 }}><Button onClick={togglePopover} intent={getButtonIntent()}
-                    large={true} style={{ opacity: 1 }} fill={true}>
-                    {getButtonIcon()}&nbsp;
-                    {props.territory.displayText} &nbsp;
-                    <Tag large={true}>{props.armies}</Tag>
-                </Button></div>
-            </Popover2>
-
-        </td>
-    );
-}
-
-
-interface IWorldMapControlPanelProps {
-    selectedTerritory: string | undefined
-    clearSelectedTerritory: () => void
-}
-
-const WorldMapControlPanel = (props: IWorldMapControlPanelProps) => {
-    if (props.selectedTerritory === undefined)
-        return (<h2>Please select a territory to move or attack from.</h2>)
-
-    return (<h2>{props.selectedTerritory}<Button onClick={props.clearSelectedTerritory}>Clear Selection</Button></h2>);
-};
+import { NamedTerritoryTile } from './TerritoryTile';
 
 const WorldMap = () => {
 
     let gameContext = useContext<IGameContext>(GameContext);
 
-    const currentPlayers: [Player, Player] = gameContext.currentPlayers;
-    let initialPositions = gameContext.currentPositions;
+    const initialState: IWorldMapState = {
+        currentPlayers: gameContext.currentPlayers,
+        currentTurn: gameContext.currentPlayers[0].name,
+        currentPositions: gameContext.currentPositions,
+        selectedTerritory: undefined
+    };
 
-    let [currentPositions, setCurrentPositions] = useState(initialPositions);
-
+    let [state, dispatch] = useReducer(worldMapReducer, initialState);
 
     useEffect(() => {
-        setCurrentPositions(initialPositions);
-    }, [initialPositions]);
+        dispatch({type:'LoadInitialState', initialState: initialState});
+        console.log("contextswitch");
+    }, [gameContext]);
 
-    let [currentTurn, setCurrentTurn] = useState(currentPlayers[0].name);
-    let [selectedTerritory, setSelectedTerritory] = useState<CountryNameKey | undefined>(undefined);
-
-    let switchUserTurn = () => {
-        let otherUser = currentPlayers.find(x => x.name !== currentTurn);
-        if (otherUser !== undefined)
-            setCurrentTurn(otherUser.name);
+    let applyArmies = (name: CountryNameKey, selectedArmies: number) => {
+        dispatch({ type: 'TargetTile', armiesToApply: selectedArmies, target: name });
     };
 
     let trySelectTerritory = (name: CountryNameKey) => {
-        if (selectedTerritory === undefined) {
-            setSelectedTerritory(name);
-            return;
-        }
-    };
-
-    let applyArmies = (name: CountryNameKey, selectedArmies: number) => {
-
-        let positions = currentPositions;
-
-        let selectedTerritoryState = positions.find(x => x.territoryName === selectedTerritory);
-        let targetTerritoryState = positions.find(x => x.territoryName === name);
-
-        if (selectedTerritoryState === undefined || targetTerritoryState === undefined)
-            return;
-
-        if (selectedTerritoryState.playerName === targetTerritoryState.playerName) {
-            // If teh tile has the same owner just move the armies.
-            selectedTerritoryState.armies -= selectedArmies;
-            targetTerritoryState.armies += selectedArmies;
-        } else {
-            // If the tiles have different owners it is an attack.
-            let [survivingAttackers, survivingDefenders] = rollBattleDice(selectedArmies, targetTerritoryState.armies);
-
-            if (survivingDefenders === 0) {
-                targetTerritoryState.playerName = selectedTerritoryState.playerName;
-                targetTerritoryState.armies = survivingAttackers;
-            } else {
-                targetTerritoryState.armies = survivingDefenders;
-                selectedTerritoryState.armies = selectedTerritoryState.armies - (selectedArmies - survivingAttackers);
-            }
-        }
-
-        let updatedPositions = positions.filter(x=>x.territoryName !== name && x.territoryName !== selectedTerritory);
-        updatedPositions.push(selectedTerritoryState);
-        updatedPositions.push(targetTerritoryState);
-
-        setSelectedTerritory(undefined);
-        setCurrentPositions(updatedPositions);
-        switchUserTurn();
+        dispatch({ type: 'SelectTile', target: name });
     };
 
     let propsToAddToEachTile: ITileContext =
     {
         ...gameContext,
-        currentPositions: currentPositions,
-        currentTurn: currentTurn,
-        selectedTerritory: selectedTerritory,
+        currentPositions: state.currentPositions,
+        currentTurn: state.currentTurn,
+        selectedTerritory: state.selectedTerritory,
         onClick: trySelectTerritory,
         applyArmies: applyArmies
     };
 
     let clearSelectedTerritory = () => {
-        setSelectedTerritory(undefined);
+        dispatch({ type: 'ClearSelection' });
     };
 
     return (
         <div>
-            <H1>Current Turn: {currentTurn}</H1>
-            <WorldMapControlPanel selectedTerritory={selectedTerritory} 
-                    clearSelectedTerritory={clearSelectedTerritory} />
+            <H1>Current Turn: {state.currentTurn}</H1>
+            <WorldMapControlPanel selectedTerritory={state.selectedTerritory}
+                clearSelectedTerritory={clearSelectedTerritory} />
             <HTMLTable>
                 <WorldMapContext.Provider value={propsToAddToEachTile}>
                     <tbody className='waterTile'>
@@ -374,5 +160,92 @@ const WorldMap = () => {
         </div>
     )
 };
+
+interface IWorldMapControlPanelProps {
+    selectedTerritory: string | undefined
+    clearSelectedTerritory: () => void
+}
+
+const WorldMapControlPanel = (props: IWorldMapControlPanelProps) => {
+    if (props.selectedTerritory === undefined)
+        return (<h2>Please select a territory to move or attack from.</h2>)
+
+    return (<h2>{props.selectedTerritory}<Button onClick={props.clearSelectedTerritory}>Clear Selection</Button></h2>);
+};
+
+interface IWorldMapState {
+    currentPlayers: [Player, Player],
+    currentTurn: string,
+    currentPositions: TerritoryState[],
+    selectedTerritory: CountryNameKey | undefined;
+}
+
+interface IWorldMapAction {
+    type: 'None' | 'SelectTile' | 'TargetTile' | 'ClearSelection' | 'LoadInitialState'
+    target?: CountryNameKey,
+    armiesToApply?: number
+    initialState?: IWorldMapState
+}
+
+
+function executeMovement(currentPositions: TerritoryState[], selectedTerritory: CountryNameKey, targetTerritory: CountryNameKey, selectedArmies: number): TerritoryState[] {
+    let positions = currentPositions;
+
+    let selectedTerritoryState = positions.find(x => x.territoryName === selectedTerritory);
+    let targetTerritoryState = positions.find(x => x.territoryName === targetTerritory);
+
+    let updatedSelectedTerritoryState;
+    let updatedTargetTerritoryState;
+
+    if (selectedTerritoryState === undefined || targetTerritoryState === undefined)
+        return positions;
+
+    if (selectedTerritoryState.playerName === targetTerritoryState.playerName) {
+        // If the tile has the same owner just move the armies.
+        updatedSelectedTerritoryState = { ...selectedTerritoryState, armies: selectedTerritoryState.armies - selectedArmies };
+        updatedTargetTerritoryState = { ...targetTerritoryState, armies: targetTerritoryState.armies + selectedArmies };
+    } else {
+        // If the tiles have different owners it is an attack.
+        let [survivingAttackers, survivingDefenders] = rollBattleDice(selectedArmies, targetTerritoryState.armies);
+
+        if (survivingDefenders === 0) {
+            updatedSelectedTerritoryState = { ...selectedTerritoryState, armies: selectedTerritoryState.armies - selectedArmies };
+            updatedTargetTerritoryState = { ...targetTerritoryState, armies: survivingAttackers, playerName: selectedTerritoryState.playerName };
+        } else {
+            updatedSelectedTerritoryState = { ...selectedTerritoryState, armies: selectedTerritoryState.armies - (selectedArmies - survivingAttackers) };
+            updatedTargetTerritoryState = { ...targetTerritoryState, armies: survivingDefenders };
+        }
+    }
+
+    let updatedPositions = positions.filter(x => x.territoryName !== targetTerritory && x.territoryName !== selectedTerritory);
+    updatedPositions.push(updatedSelectedTerritoryState);
+    updatedPositions.push(updatedTargetTerritoryState);
+
+    return updatedPositions;
+}
+
+let worldMapReducer = (state: IWorldMapState, action: IWorldMapAction) => {
+    switch (action.type) {
+        case 'LoadInitialState':
+            if(action.initialState)
+                return action.initialState;
+            break;
+        case 'ClearSelection':
+            state.selectedTerritory = undefined;
+            return state;
+        case 'SelectTile':
+            if (!state.selectedTerritory && action.target)
+                return {...state, selectedTerritory: action.target  };
+            return state;
+        case 'TargetTile':
+            if (!state.selectedTerritory || !action.armiesToApply || !action.target)
+                return state;
+
+            let otherUser = state.currentPlayers.find(x => x.name !== state.currentTurn)?.name ?? state.currentTurn;
+            let updatedPositions = executeMovement(state.currentPositions, state.selectedTerritory, action.target, action.armiesToApply);
+            return { ...state, currentPositions: updatedPositions, selectedTerritory: undefined, currentTurn: otherUser };
+    }
+    return state;
+}
 
 export default WorldMap;

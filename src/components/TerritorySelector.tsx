@@ -27,7 +27,7 @@ const TerritorySelect = (props: ITerritorySelectProps) => {
     const [dataForTable, setDataForTable] = useState(initData);
     const [player1Name, setPlayer1Name] = useState("player1");
     const [player2Name, setPlayer2Name] = useState("player2");
-    const [canSubmitData, setCanSubmitData] = useState(true);
+    const [canSubmitData, setCanSubmitData] = useState(false);
 
     const setRandomDataSet = () => {
         let totalPlayer1 = 40 - dataForTable.length / 2;
@@ -80,6 +80,7 @@ const TerritorySelect = (props: ITerritorySelectProps) => {
             }
         });
 
+        setCanSubmitData(testCanSubmitData());
         setDataForTable(updatedDataForTable);
     };
 
