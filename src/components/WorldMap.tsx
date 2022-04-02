@@ -7,6 +7,15 @@ import Player from '../data/models/Player';
 import { rollBattleDice } from '../utilities/Randomization';
 import { NamedTerritoryTile } from './TerritoryTile';
 
+import {
+    ComposableMap,
+    Geographies,
+    Geography,
+    Sphere,
+    Graticule,
+    Annotation
+  } from "react-simple-maps";
+
 const WorldMap = () => {
 
     let gameContext = useContext<IGameContext>(GameContext);
@@ -61,8 +70,8 @@ const WorldMap = () => {
                     </Card>
                 </div>
                 <div style={{overflow:"auto", marginLeft:150}}>
-                        <HTMLTable>
                             <WorldMapContext.Provider value={propsToAddToEachTile}>
+                        <HTMLTable>
                                 <tbody className='waterTile'>
                                     <tr>
                                         <NamedTerritoryTile name="Alaska" />
@@ -164,10 +173,59 @@ const WorldMap = () => {
                                         <td></td>
                                     </tr>
                                 </tbody>
-                            </WorldMapContext.Provider>
                         </HTMLTable>
+                        <ComposableMap
+      projectionConfig={{
+        rotate: [-10, 0, 0],
+        scale: 147
+      }}
+    >
+      <Sphere stroke="#E4E5E6" strokeWidth={0.5}  id="earth" fill="#fff"/>
+      <Graticule stroke="#E4E5E6" strokeWidth={0.5} />
+        <Geographies geography='http://localhost:3000/riskmapsaaf.json'>
+          {({ geographies }) =>
+            geographies.map((geo) => {
+              const d = state.currentPositions
+                    .find((s) => s.territoryName === geo.properties.name);
+              return (
+             <Geography
+                  key={geo.rsmKey}
+                  geography={geo}
+                  stroke="#36363636"
+                  
+                  fill={d?.playerName === "player1" ? "#f00" : "#F5F4F6"}
+                >
+                    <text>{d?.playerName}</text>
+                </Geography>
+              );
+            })
+          }
+        </Geographies>
+        
+    </ComposableMap>
+
+
+    <SVGMap></SVGMap>
+
+                            </WorldMapContext.Provider>
+
+
+
                     </div></div></div>
     )
+};
+
+const SVGMap =  () => {
+
+    let gameContext = useContext<IGameContext>(GameContext);
+
+    let terrs = gameContext.currentMap.territoryPathDefinitions.map(x=> (<path d={x.pathDef} id={x.name}></path>));
+
+    return (
+        <svg style={{width:900}} viewBox='0 0 210 297' width={"100%"}>
+            {terrs}
+        </svg>
+    );
 };
 
 interface IWorldMapControlPanelProps {

@@ -12,15 +12,22 @@ export type Territory = {
     name: CountryNameKey 
     displayText: string
     continentName: ContinentNameKey
-    value:number
+    value:number,
+    isoCodes?: string[]
 }
 
 export type TerritoryBridge = [CountryNameKey, CountryNameKey]   
 
+export type TerritoryPathDefinition = {
+    name: CountryNameKey,
+    pathDef: string
+}
+
 export type GameMap = {
     continents: Continent[] 
     territories: Territory[]
-    territoryBridges: TerritoryBridge[]
+    territoryBridges: TerritoryBridge[],
+    territoryPathDefinitions: TerritoryPathDefinition[]
 }
 
 export default GameMap;

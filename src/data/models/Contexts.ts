@@ -4,11 +4,29 @@ import GameMap, { CountryNameKey } from "./GameMap";
 import { TerritoryState } from "./GameState";
 import Player from "./Player";
 
-export const GameContext = React.createContext<IGameContext>(constructInitialGameContext())
-export const WorldMapContext = React.createContext<ITileContext>(constructEmptyWorldMapContext());
 
-export interface IGameContext 
-{
+const emptyContext: IGameContext = {
+    currentMap: { continents: [], territories: [], territoryBridges: [], territoryPathDefinitions:[] },
+    currentPlayers: [{ name: "Player 1", displayName: 'Player 1' }, { name: "Player 2", displayName: 'Player 2' }],
+    currentPositions: [],
+    currentTurn: 'Player 1',
+    selectedTerritory: undefined
+};
+
+const emptyMapContext: ITileContext = {
+    currentMap: { continents: [], territories: [], territoryBridges: [], territoryPathDefinitions:[] },
+    currentPlayers: [{ name: "Player 1", displayName: 'Player 1' }, { name: "Player 2", displayName: 'Player 2' }],
+    currentPositions: [],
+    currentTurn: 'Player 1',
+    selectedTerritory: undefined,
+    applyArmies: (x, y) => { },
+    onClick: (x) => { }
+};
+
+export const GameContext = React.createContext<IGameContext>(emptyContext)
+export const WorldMapContext = React.createContext<ITileContext>(emptyMapContext);
+
+export interface IGameContext {
     currentMap: GameMap
     currentPlayers: [Player, Player]
     currentPositions: TerritoryState[]
@@ -17,6 +35,6 @@ export interface IGameContext
 }
 
 export interface ITileContext extends IGameContext {
-    applyArmies(territoryName: CountryNameKey,selectedArmies: number): void;
+    applyArmies(territoryName: CountryNameKey, selectedArmies: number): void;
     onClick(territoryName: CountryNameKey): void
 }

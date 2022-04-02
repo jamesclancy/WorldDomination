@@ -11,7 +11,6 @@ export interface ITerritorySelectProps {
     Territories: Territory[]
 }
 
-
 interface ITerritorySelectState {
 
     cellIntents:Intent[][],
