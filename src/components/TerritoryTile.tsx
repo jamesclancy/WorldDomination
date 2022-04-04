@@ -1,197 +1,302 @@
-import { Button, H5, Icon, Intent, Slider, Tag } from '@blueprintjs/core';
-import { Popover2, Classes } from '@blueprintjs/popover2';
-import { useContext, useEffect, useReducer, useState } from 'react';
-import { ITileContext, WorldMapContext } from '../data/models/Contexts';
-import { Continent, CountryNameKey, Territory, TerritoryPotentialActions } from '../data/models/GameMap';
-import { TerritoryState } from '../data/models/GameState';
-import { buildTerritoryPropsForTile, getTileClass } from '../data/models/Selectors';
+import {
+  Button,
+  Card,
+  Dialog,
+  H5,
+  Icon,
+  Intent,
+  Overlay,
+  Slider,
+  Tag,
+} from "@blueprintjs/core";
+import { Popover2, Classes } from "@blueprintjs/popover2";
+import { useContext, useEffect, useReducer, useState } from "react";
+import { ITileContext, WorldMapContext } from "../data/models/Contexts";
+import {
+  Continent,
+  CountryNameKey,
+  Territory,
+  TerritoryPathDefinition,
+  TerritoryPotentialActions,
+} from "../data/models/GameMap";
+import { TerritoryState } from "../data/models/GameState";
+import Player from "../data/models/Player";
+import {
+  buildTerritoryPropsForTile,
+  getTileClass,
+} from "../data/models/Selectors";
 
 export interface ITerritoryProps {
-    applyArmy(selectedArmies: number): void;
-    potentialActions: TerritoryPotentialActions;
-    isTerritorySelected: boolean;
-    possibleArmiesToApply: number;
-    territory: Territory,
-    continent: Continent,
-    territoryState?: TerritoryState,
-    armies: number,
-    colSpan?: number,
-    rowSpan?: number,
-    select(): void
+  applyArmy(selectedArmies: number): void;
+  potentialActions: TerritoryPotentialActions;
+  isTerritorySelected: boolean;
+  possibleArmiesToApply: number;
+  territory: Territory;
+  continent: Continent;
+  territoryState?: TerritoryState;
+  armies: number;
+  pathDefinition: TerritoryPathDefinition;
+  ownerIndex: number;
+  select(): void;
 }
 
 export interface INamedTerritoryTile {
-    name: CountryNameKey,
-    colSpan?: number,
-    rowSpan?: number
+  name: CountryNameKey;
 }
 
 export const NamedTerritoryTile = (props: INamedTerritoryTile) => {
+  let worldMapContext = useContext<ITileContext>(WorldMapContext);
 
-    let worldMapContext = useContext<ITileContext>(WorldMapContext);
+  let terPops = buildTerritoryPropsForTile(worldMapContext, props.name);
 
-    let terPops = buildTerritoryPropsForTile(worldMapContext, props.name);
-
-    if (typeof terPops === "string") {
-
-        return (<td>{terPops}</td>);
-    }
-    return (
-        <TerritoryTile {...terPops} rowSpan={props.rowSpan} colSpan={props.colSpan}
-        />);
+  if (typeof terPops === "string") {
+    console.log(terPops);
+    return <></>;
+  }
+  return <TerritoryTile {...terPops} />;
 };
 
-
 interface ITerritoryState {
-    showPopover: boolean,
-    selectedArmies: number,
-
-
+  showPopover: boolean;
+  selectedArmies: number;
 }
 
 interface ITerritoryStateAction {
-    type: 'None'| 'TogglePopover' | 'SelectArmies' | 'Cancel' | 'Confirm',
-    armyCount?: number
+  type: "None" | "TogglePopover" | "SelectArmies" | "Cancel" | "Confirm";
+  armyCount?: number;
 }
 
-const territoryStateReducer = (state: ITerritoryState, action : ITerritoryStateAction) => {
-    switch(action.type){
-        case "Cancel":
-            return {...state, showPopover: false};
-        case "TogglePopover":
-            return {...state, showPopover: !state.showPopover};
-        case "SelectArmies":
-            return {...state, selectedArmies: action.armyCount ?? 1};
-    }
+const territoryStateReducer = (
+  state: ITerritoryState,
+  action: ITerritoryStateAction
+) => {
+  switch (action.type) {
+    case "Cancel":
+      return { ...state, showPopover: false };
+    case "TogglePopover":
+      return { ...state, showPopover: !state.showPopover };
+    case "SelectArmies":
+      return { ...state, selectedArmies: action.armyCount ?? 1 };
+  }
 
-    return state;
+  return state;
 };
 
 const TerritoryTile = (props: ITerritoryProps) => {
+  let initialState: ITerritoryState = { showPopover: false, selectedArmies: 1 };
+  let [state, dispatch] = useReducer(territoryStateReducer, initialState);
 
+  const isSelected = props.isTerritorySelected;
+  const isClickable = props.potentialActions !== "None";
 
-    let initialState : ITerritoryState = { showPopover:false, selectedArmies: 1 };
-    let [state, dispatch] = useReducer(territoryStateReducer, initialState);
+  function click() {
+    if (isClickable) props.select();
+  }
 
-    const isSelected = props.isTerritorySelected;
-    const isClickable = props.potentialActions !== "None";
+  function applyArmies() {
+    togglePopover();
+    props.applyArmy(state.selectedArmies);
+  }
 
-    function click() {
-        if (isClickable)
-            props.select();
+  function togglePopover() {
+    dispatch({ type: "TogglePopover" });
+  }
+
+  function getButtonIcon() {
+    if (isSelected) {
+      return <Icon icon="star" />;
     }
-
-    function applyArmies() {
-        togglePopover();
-        props.applyArmy(state.selectedArmies);
-    }
-
-    function togglePopover() {
-        dispatch({type: 'TogglePopover'})
-    }
-
-    function getButtonIcon() {
-        if (isSelected) {
-            return (<Icon icon="star" />);
-        }
-        switch (props.potentialActions) {
-            case 'Attack':
-                return (<Icon icon="locate" />);
-            case 'Move':
-                return (<Icon icon="flow-end" />);
-            case 'Select':
-                return (<Icon icon="map-marker" />);
-        }
-    };
-
-    function setArmies(armies: number) {
-        dispatch({type: 'SelectArmies', armyCount:armies });
-    }
-
-    function getButtonIntent(): Intent {
-        if (isSelected) {
-            return Intent.PRIMARY;
-        }
-        switch (props.potentialActions) {
-            case 'Attack':
-                return Intent.DANGER
-            case 'Move':
-                return Intent.WARNING;
-            case 'Select':
-                return Intent.SUCCESS;
-        }
-
-        return Intent.NONE;
-    };
-
-
-    let popOverContent = () => {
-        let slider = props.possibleArmiesToApply === 1 ?
-            (<><p>Are you sure you want to use your only spare army?</p></>)
-            : (<><p>Select armies to move.</p>
-                <Slider key="slider" 
-                min={1} 
-                max={props.possibleArmiesToApply} 
-                onChange={setArmies} 
-                value={state.selectedArmies} />
-            </>);
-
-        return (
-            <div className='popOverSelector'>
-                <H5>Confirm {props.potentialActions}</H5>
-                {slider}
-                <div style={{ display: "flex", justifyContent: "flex-end", marginTop: 15 }}>
-                    <Button className={Classes.POPOVER2_DISMISS} style={{ marginRight: 10 }} onClick={togglePopover}>
-                        Cancel
-                    </Button>
-                    <Button intent={Intent.DANGER} className={Classes.POPOVER2_DISMISS} onClick={applyArmies}>
-                        Confirm
-                    </Button>
-                </div>
-            </div>
-        );
-    };
-
     switch (props.potentialActions) {
-        case 'Select':
-        case 'None':
-            return (
-                <td className={getTileClass(props.continent.name)}
-                    rowSpan={props.rowSpan ?? 1}
-                    colSpan={props.colSpan ?? 1}
-                    height={200 * (props.rowSpan ?? 1)}
-                    width={250 * (props.colSpan ?? 1)}
-                >
-                    <div style={{ background: "#fff" }}><Button onClick={click} intent={getButtonIntent()}
-                        large={true} disabled={props.potentialActions === "None"}
-                        style={{ opacity: 1 }} fill={true}>
-                        {getButtonIcon()}&nbsp;
-                        {props.territory.displayText} &nbsp;
-                        <Tag large={true}>{props.armies}</Tag>
-                    </Button></div>
-                </td>
-            );
+      case "Attack":
+        return <Icon icon="locate" />;
+      case "Move":
+        return <Icon icon="flow-end" />;
+      case "Select":
+        return <Icon icon="map-marker" />;
     }
+  }
+
+  function setArmies(armies: number) {
+    dispatch({ type: "SelectArmies", armyCount: armies });
+  }
+
+  function getButtonIntent(): Intent {
+    if (isSelected) {
+      return Intent.PRIMARY;
+    }
+    switch (props.potentialActions) {
+      case "Attack":
+        return Intent.DANGER;
+      case "Move":
+        return Intent.WARNING;
+      case "Select":
+        return Intent.SUCCESS;
+    }
+
+    return Intent.NONE;
+  }
+
+  let popOverContent = () => {
+    let slider =
+      props.possibleArmiesToApply === 1 ? (
+        <>
+          <p>Are you sure you want to use your only spare army?</p>
+        </>
+      ) : (
+        <>
+          <p>Select armies to move.</p>
+          <Slider
+            key="slider"
+            min={1}
+            max={props.possibleArmiesToApply}
+            onChange={setArmies}
+            value={state.selectedArmies}
+          />
+        </>
+      );
 
     return (
-        <td className={getTileClass(props.continent.name)}
-            rowSpan={props.rowSpan ?? 1}
-            colSpan={props.colSpan ?? 1}
-            height={200 * (props.rowSpan ?? 1)}
-            width={250 * (props.colSpan ?? 1)}
+      <div className="popOverSelector">
+        <H5>Confirm {props.potentialActions}</H5>
+        {slider}
+        <div
+          style={{ display: "flex", justifyContent: "flex-end", marginTop: 15 }}
         >
-            <Popover2
-                enforceFocus={true}
-                isOpen={state.showPopover}
-                content={popOverContent()}
-            >
-                <div style={{ background: "#fff", width: 300 }}><Button onClick={togglePopover} intent={getButtonIntent()}
-                    large={true} style={{ opacity: 1 }} fill={true}>
-                    {getButtonIcon()}&nbsp;
-                    {props.territory.displayText} &nbsp;
-                    <Tag large={true}>{props.armies}</Tag>
-                </Button></div>
-            </Popover2>
-        </td>
+          <Button
+            className={Classes.POPOVER2_DISMISS}
+            style={{ marginRight: 10 }}
+            onClick={togglePopover}
+          >
+            Cancel
+          </Button>
+          <Button
+            intent={Intent.DANGER}
+            className={Classes.POPOVER2_DISMISS}
+            onClick={applyArmies}
+          >
+            Confirm
+          </Button>
+        </div>
+      </div>
     );
-}
+  };
+
+  const fillColor = () => {
+    switch (props.potentialActions) {
+      case "None":
+        return "#cffefa";
+      case "Attack":
+        return "#E68E90";
+      case "Move":
+        return "#E6C78E";
+      case "Select":
+        return "#8EE698";
+    }
+  };
+
+  const strokeColor = () => {
+    if (isSelected) return "#FFB703";
+
+    return "#000";
+  };
+
+  const textColor = () => {
+    switch (props.potentialActions) {
+      case "None":
+        return "#00f";
+      case "Attack":
+        return "#00f";
+      case "Move":
+        return "#ff0";
+      case "Select":
+        return "#00f";
+    }
+  };
+
+  const bannerColor = props.ownerIndex === 1 ? "#FB8500" : "#023047";
+
+  const textGroup = (
+    <>
+      <rect
+        x={props.pathDefinition.textBoxX}
+        width={props.pathDefinition.textBoxWidth}
+        y={props.pathDefinition.textBoxY}
+        height={3}
+        fill={bannerColor}
+        rx={3}
+      />
+
+      <rect
+        x={props.pathDefinition.textBoxX + 1}
+        width={2}
+        y={props.pathDefinition.textBoxY - 1}
+        height={5}
+        fill={bannerColor}
+        rx={0}
+      />
+      <text
+        fontSize="2"
+        textAnchor="start"
+        dominantBaseline="before-edge"
+        x={props.pathDefinition.textBoxX + 3.5}
+        width={props.pathDefinition.textBoxWidth - 5}
+        y={props.pathDefinition.textBoxY + 2.2}
+        height={props.pathDefinition.textBoxHeight}
+        color={textColor()}
+        href={"#" + props.territory.name}
+        fill="#fff"
+      >
+        {props.territory.displayText}
+      </text>
+      <text
+        fontSize="2"
+        textAnchor="start"
+        dominantBaseline="before-edge"
+        x={props.pathDefinition.textBoxX + (props.armies > 9 ? 1 : 1.5)}
+        width={props.pathDefinition.textBoxWidth - 5}
+        y={props.pathDefinition.textBoxY + 2.2}
+        height={props.pathDefinition.textBoxHeight}
+        color={textColor()}
+        href={"#" + props.territory.name}
+        fill="#fff"
+      >
+        {props.armies}
+      </text>
+    </>
+  );
+
+  switch (props.potentialActions) {
+    case "Select":
+    case "None":
+      return (
+        <g onClick={click}>
+          <path
+            d={props.pathDefinition.pathDef}
+            key={props.territory.name}
+            fill={fillColor()}
+            stroke={strokeColor()}
+            strokeWidth={0.3}
+          ></path>
+          {textGroup}
+        </g>
+      );
+  }
+
+  return (
+    <>
+      <g onClick={togglePopover}>
+        <path
+          d={props.pathDefinition.pathDef}
+          key={props.territory.name}
+          stroke={strokeColor()}
+          strokeWidth={0.3}
+          fill={fillColor()}
+        ></path>
+        {textGroup}
+      </g>
+      <Dialog isOpen={state.showPopover} canOutsideClickClose={false}>
+        {popOverContent()}
+      </Dialog>
+    </>
+  );
+};

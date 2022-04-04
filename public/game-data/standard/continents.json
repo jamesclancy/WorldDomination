@@ -1,26 +1,26 @@
 [
-    {
-        "name": "NorthAmerica",
-        "displayName": "North America"
-    },
-    {
-        "name": "SouthAmerica",
-        "displayName": "South America"
-    },
-    {
-        "name": "Europe",
-        "displayName": "Europe"
-    },
-    {
-        "name": "Asia",
-        "displayName": "Asia"
-    },
-    {
-        "name": "Africa",
-        "displayName": "Africa"
-    },
-    {
-        "name": "Oceania",
-        "displayName": "Oceania"
-    }
+  {
+    "name": "NorthAmerica",
+    "displayName": "North America"
+  },
+  {
+    "name": "SouthAmerica",
+    "displayName": "South America"
+  },
+  {
+    "name": "Europe",
+    "displayName": "Europe"
+  },
+  {
+    "name": "Asia",
+    "displayName": "Asia"
+  },
+  {
+    "name": "Africa",
+    "displayName": "Africa"
+  },
+  {
+    "name": "Oceania",
+    "displayName": "Oceania"
+  }
 ]

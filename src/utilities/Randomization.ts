@@ -1,13 +1,16 @@
-export function shuffle(array: any[]) : any[] {
-    return array.map(value => ({ value, sort: Math.random() }))
+export function shuffle(array: any[]): any[] {
+  return array
+    .map((value) => ({ value, sort: Math.random() }))
     .sort((a, b) => a.sort - b.sort)
     .map(({ value }) => value);
 }
 
-export function rollBattleDice(attackers: number, defenders: number)  : [number, number] {
-    const attackerAdvantage = attackers - defenders;
-    const outcome = Math.floor(Math.random() * attackerAdvantage);
+export function rollBattleDice(
+  attackers: number,
+  defenders: number
+): [number, number] {
+  const attackerAdvantage = attackers - defenders;
+  const outcome = Math.floor(Math.random() * attackerAdvantage);
 
-    console.log([attackers, defenders, attackerAdvantage, outcome]);
-    return [Math.max(attackers - outcome, 0), Math.max(defenders - outcome, 0)];
+  return [Math.max(attackers - outcome, 0), Math.max(defenders - outcome, 0)];
 }

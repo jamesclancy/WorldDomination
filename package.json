@@ -46,6 +46,7 @@
     ]
   },
   "devDependencies": {
-    "@types/react-simple-maps": "^1.0.8"
+    "@types/react-simple-maps": "^1.0.8",
+    "prettier": "2.6.2"
   }
 }
