@@ -24,6 +24,7 @@ export async function constructEmptyWorldMapContext(): Promise<ITileContext> {
 export async function constructInitialGameContext(): Promise<IGameContext> {
   var newGame = await constructNewGame({});
   let context: IGameContext = {
+    roundStep: "Movement",
     currentMap: newGame.currentMap,
     currentPlayers: newGame.currentPlayers,
     currentPositions: [],

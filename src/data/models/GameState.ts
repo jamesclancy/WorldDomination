@@ -15,3 +15,5 @@ export type GameState = {
   selectedTerritory: string | undefined;
   onClickTerritory(territoryName: string): void;
 };
+
+export type RoundStepType = "AddArmies" | "Movement";

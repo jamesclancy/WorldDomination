@@ -1,4 +1,4 @@
-import { Button, Menu, MenuItem } from "@blueprintjs/core";
+import { Menu, MenuItem } from "@blueprintjs/core";
 import { useContext } from "react";
 import { ITileContext, WorldMapContext } from "../data/models/Contexts";
 import {
@@ -28,6 +28,8 @@ export const WorldMapControlPanel = (props: IWorldMapControlPanelProps) => {
         return "target";
       case "Move":
         return "move";
+      case "AddArmies":
+        return "add";
     }
   };
 
@@ -58,10 +60,10 @@ export const WorldMapControlPanel = (props: IWorldMapControlPanelProps) => {
   let movements = <Menu>{possibleActions}</Menu>;
 
   return (
-    <h5>
-      Current Turn: {worldMapContext.currentTurn}
+    <>
+      <h5>Current Turn: {worldMapContext.currentTurn}</h5>
       {movements}
-    </h5>
+    </>
   );
 };
 

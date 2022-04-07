@@ -1,16 +1,6 @@
-import {
-  Button,
-  Card,
-  Dialog,
-  H5,
-  Icon,
-  Intent,
-  Overlay,
-  Slider,
-  Tag,
-} from "@blueprintjs/core";
-import { Popover2, Classes } from "@blueprintjs/popover2";
-import { useContext, useEffect, useReducer, useState } from "react";
+import { Button, Dialog, H5, Intent, Slider } from "@blueprintjs/core";
+import { Classes } from "@blueprintjs/popover2";
+import { useContext, useReducer } from "react";
 import { ITileContext, WorldMapContext } from "../data/models/Contexts";
 import {
   Continent,
@@ -20,11 +10,7 @@ import {
   TerritoryPotentialActions,
 } from "../data/models/GameMap";
 import { TerritoryState } from "../data/models/GameState";
-import Player from "../data/models/Player";
-import {
-  buildTerritoryPropsForTile,
-  getTileClass,
-} from "../data/models/Selectors";
+import { buildTerritoryPropsForTile } from "../data/models/Selectors";
 
 export interface ITerritoryProps {
   applyArmy(selectedArmies: number): void;
@@ -102,38 +88,8 @@ const TerritoryTile = (props: ITerritoryProps) => {
     dispatch({ type: "TogglePopover" });
   }
 
-  function getButtonIcon() {
-    if (isSelected) {
-      return <Icon icon="star" />;
-    }
-    switch (props.potentialActions) {
-      case "Attack":
-        return <Icon icon="locate" />;
-      case "Move":
-        return <Icon icon="flow-end" />;
-      case "Select":
-        return <Icon icon="map-marker" />;
-    }
-  }
-
   function setArmies(armies: number) {
     dispatch({ type: "SelectArmies", armyCount: armies });
-  }
-
-  function getButtonIntent(): Intent {
-    if (isSelected) {
-      return Intent.PRIMARY;
-    }
-    switch (props.potentialActions) {
-      case "Attack":
-        return Intent.DANGER;
-      case "Move":
-        return Intent.WARNING;
-      case "Select":
-        return Intent.SUCCESS;
-    }
-
-    return Intent.NONE;
   }
 
   let popOverContent = () => {

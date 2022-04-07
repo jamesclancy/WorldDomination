@@ -1,10 +1,6 @@
 import React from "react";
-import {
-  constructEmptyWorldMapContext,
-  constructInitialGameContext,
-} from "../services/WorldBuilder";
 import GameMap, { CountryNameKey } from "./GameMap";
-import { TerritoryState } from "./GameState";
+import { RoundStepType, TerritoryState } from "./GameState";
 import Player from "./Player";
 
 const emptyContext: IGameContext = {
@@ -20,6 +16,7 @@ const emptyContext: IGameContext = {
   ],
   currentPositions: [],
   currentTurn: "Player 1",
+  roundStep: "Movement",
   selectedTerritory: undefined,
 };
 
@@ -36,6 +33,7 @@ const emptyMapContext: ITileContext = {
   ],
   currentPositions: [],
   currentTurn: "Player 1",
+  roundStep: "Movement",
   selectedTerritory: undefined,
   applyArmies: (x, y) => {},
   onClick: (x) => {},
@@ -47,6 +45,7 @@ export const WorldMapContext =
 
 export interface IGameContext {
   currentMap: GameMap;
+  roundStep: RoundStepType;
   currentPlayers: [Player, Player];
   currentPositions: TerritoryState[];
   currentTurn: string;

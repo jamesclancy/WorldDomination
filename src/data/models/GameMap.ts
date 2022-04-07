@@ -1,4 +1,4 @@
-export type TerritoryPotentialActions = "None" | "Move" | "Attack" | "Select";
+export type TerritoryPotentialActions = "None" | "Move" | "Attack" | "Select" | "AddArmies";
 export type ContinentNameKey =
   | "NorthAmerica"
   | "SouthAmerica"

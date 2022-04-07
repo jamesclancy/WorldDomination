@@ -6,7 +6,6 @@ import { TerritoryState } from "./data/models/GameState";
 import Player from "./data/models/Player";
 import { GameContext, IGameContext } from "./data/models/Contexts";
 import { Intent, Spinner } from "@blueprintjs/core";
-import { INTENT_DANGER } from "@blueprintjs/core/lib/esm/common/classes";
 import { constructInitialGameContext } from "./data/services/WorldBuilder";
 
 function App() {

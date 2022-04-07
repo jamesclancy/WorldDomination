@@ -1,6 +1,6 @@
 import { Button, Card, H3, InputGroup, Intent } from "@blueprintjs/core";
 import { Cell, Column, EditableCell, Table2 } from "@blueprintjs/table";
-import { ChangeEvent, ChangeEventHandler, useReducer, useState } from "react";
+import { ChangeEvent, ChangeEventHandler, useReducer } from "react";
 import { Territory } from "../data/models/GameMap";
 import { TerritoryState } from "../data/models/GameState";
 import Player from "../data/models/Player";
@@ -302,12 +302,10 @@ const attemptToUpdatePlayerNameInTable = (
   newName: string
 ) => {
   let updatedDataForTable = state.dataForTable;
-  let anyUpdates = false;
 
   state.dataForTable.forEach((element, row) => {
     if (element[2] === preName) {
       updatedDataForTable[row] = [element[0], element[1], newName, element[3]];
-      anyUpdates = true;
     }
   });
 

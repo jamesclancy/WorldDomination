@@ -69,6 +69,15 @@ export function getPotentialActionsForTerritory(
 
   if (territoryState === undefined) return "None";
 
+  if (context.roundStep === "AddArmies") {
+    if (
+      context.selectedTerritory === undefined &&
+      territoryState.playerName === context.currentTurn
+    ) {
+      return "AddArmies";
+    } else return "None";
+  }
+
   if (
     territoryState.playerName === context.currentTurn &&
     territoryState.armies > 1 &&
@@ -136,9 +145,10 @@ export function buildTerritoryPropsForTile(
   let actions = getPotentialActionsForTerritory(worldMapContext, name);
   let isSelected = name === worldMapContext.selectedTerritory;
 
-  let [selectedTerritory, selectedTerritoryState] = getSelectedTerritory(
-    worldMapContext
-  ) ?? [undefined, undefined];
+  let [, selectedTerritoryState] = getSelectedTerritory(worldMapContext) ?? [
+    undefined,
+    undefined,
+  ];
 
   let props: ITerritoryProps = {
     continent: continent,
