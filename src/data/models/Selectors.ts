@@ -150,13 +150,20 @@ export function buildTerritoryPropsForTile(
     undefined,
   ];
 
+
+  let remainingArmiesToAdd = context.currentTurnOutstandingArmies;
+  let possibleArmiesToApply = 
+    (actions === "AddArmies") ? remainingArmiesToAdd
+      : (selectedTerritoryState === undefined
+      ? 0
+      : selectedTerritoryState?.armies - 1 ?? 0);
+
+
+
   let props: ITerritoryProps = {
     continent: continent,
     territory: territory,
-    possibleArmiesToApply:
-      selectedTerritoryState === undefined
-        ? 0
-        : selectedTerritoryState?.armies - 1 ?? 0,
+    possibleArmiesToApply:possibleArmiesToApply,
     armies: territoryState?.armies ?? 0,
     potentialActions: actions,
     isTerritorySelected: isSelected,

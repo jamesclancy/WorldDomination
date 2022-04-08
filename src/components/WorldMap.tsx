@@ -1,6 +1,4 @@
 import {
-  Button,
-  Classes,
   H6,
   Navbar,
   NavbarDivider,
@@ -63,8 +61,10 @@ const WorldMap = () => {
     currentPositions: state.currentPositions,
     currentTurn: state.currentTurn,
     selectedTerritory: state.selectedTerritory,
+    roundStep: state.roundStep,
     onClick: trySelectTerritory,
     applyArmies: applyArmies,
+    currentTurnOutstandingArmies: state.armiesToApply.find(x=>x.playerName === state.currentTurn)?.numberOfArmiesRemaining ?? 0
   };
 
   let clearSelectedTerritory = () => {
@@ -77,8 +77,6 @@ const WorldMap = () => {
         <NavbarGroup align="right">
           <NavbarHeading>World Domination</NavbarHeading>
           <NavbarDivider />
-          <Button className={Classes.MINIMAL} icon="home" text="Home" />
-          <Button className={Classes.MINIMAL} icon="log-in" text="Account" />
         </NavbarGroup>
       </Navbar>
       <WorldMapContext.Provider value={propsToAddToEachTile}>

@@ -1,7 +1,7 @@
 import { CountryNameKey } from "../models/GameMap";
 import { RoundStepType, TerritoryState } from "../models/GameState";
 import Player from "../models/Player";
-import { executeArmyMovementAgainstTerritoryStates } from "./UserActions";
+import { addArmiesToTile, executeArmyMovementAgainstTerritoryStates } from "./UserActions";
 
 export type ArmyApplicationSet = {
   playerName: string;
@@ -56,6 +56,16 @@ export function moveToNextTurn(state: IWorldMapState): IWorldMapState {
   }
 
   const newState = state.roundStep === "Movement" ? "AddArmies" : "Movement";
+
+  const newArmyValue: ArmyApplicationSet[] =
+    newState === "Movement"
+      ? state.currentPlayers.map((x) => {
+          return { playerName: x.name, numberOfArmiesRemaining: 100 };
+        })
+      : state.currentPlayers.map((x) => {
+        return { playerName: x.name, numberOfArmiesRemaining: 100 };
+      });
+
   const stepReset = state.currentPlayers.map((x) => x.name);
 
   const newRoundCounter = state.roundCounter + 1;
@@ -68,6 +78,7 @@ export function moveToNextTurn(state: IWorldMapState): IWorldMapState {
     roundStep: newState,
     roundStepRemainingPlayerTurns: newRoundStepRemainingPlayerTurns,
     roundCounter: newRoundCounter,
+    armiesToApply: newArmyValue,
   };
 }
 
@@ -101,31 +112,78 @@ export function worldMapReducer(
       }
       return state;
     case "TargetTile":
-      if (!state.selectedTerritory || !action.armiesToApply || !action.target)
-        return state;
+      if (!action.armiesToApply || !action.target) return state;
 
-      let otherUser =
-        state.currentPlayers.find((x) => x.name !== state.currentTurn)?.name ??
-        state.currentTurn;
-      let [update, updatedPositions] =
-        executeArmyMovementAgainstTerritoryStates(
+      const otherUser =
+      state.currentPlayers.find((x) => x.name !== state.currentTurn)
+        ?.name ?? state.currentTurn;
+
+      if (state.selectedTerritory === undefined) {
+        // add armies
+        let remainingArmiesAfterAdd : number = (state.armiesToApply.find(x=>x.playerName === state.currentTurn)?.numberOfArmiesRemaining ?? 0) - action.armiesToApply;
+
+        if(remainingArmiesAfterAdd < 0) {
+
+          return { ...state, history:appendEventToHistory(
+            state.roundCounter,
+            `${state.currentPlayers} has ${remainingArmiesAfterAdd} armies remaining to apply.`,
+            state.history
+          )};
+        }
+        
+        let [update, updatedPositions] =
+        addArmiesToTile(
           state.currentPositions,
-          state.selectedTerritory,
           action.target,
           action.armiesToApply
         );
-      let updatedHistory = appendEventToHistory(
-        state.roundCounter,
-        update,
-        state.history
-      );
-      return {
-        ...moveToNextTurn(state),
-        currentPositions: updatedPositions,
-        selectedTerritory: undefined,
-        currentTurn: otherUser,
-        history: updatedHistory,
-      };
+
+        let updatedHistory = appendEventToHistory(
+          state.roundCounter,
+          update,
+          state.history
+        );
+        
+        updatedHistory = appendEventToHistory(
+          state.roundCounter,
+          `${state.currentTurn} has ${remainingArmiesAfterAdd} armies remaining to apply.`,
+          updatedHistory
+        );
+
+        const remainingArmies = state.armiesToApply.map(x=> x.playerName === state.currentTurn ? {playerName:x.playerName, numberOfArmiesRemaining: remainingArmiesAfterAdd} : x);
+
+        const shouldMoveToNextTurn = (remainingArmiesAfterAdd ===  0);
+
+        const baseStateForReturn =  shouldMoveToNextTurn ? moveToNextTurn(state) : state;
+
+        return {
+          ...baseStateForReturn,
+          currentPositions: updatedPositions,
+          selectedTerritory: undefined,
+          history: updatedHistory,
+          armiesToApply: remainingArmies
+        };
+      } else {
+        let [update, updatedPositions] =
+          executeArmyMovementAgainstTerritoryStates(
+            state.currentPositions,
+            state.selectedTerritory,
+            action.target,
+            action.armiesToApply
+          );
+        let updatedHistory = appendEventToHistory(
+          state.roundCounter,
+          update,
+          state.history
+        );
+        return {
+          ...moveToNextTurn(state),
+          currentPositions: updatedPositions,
+          selectedTerritory: undefined,
+          currentTurn: otherUser,
+          history: updatedHistory,
+        };
+      }
   }
   return state;
 }

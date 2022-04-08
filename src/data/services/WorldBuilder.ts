@@ -30,6 +30,7 @@ export async function constructInitialGameContext(): Promise<IGameContext> {
     currentPositions: [],
     currentTurn: newGame.currentPlayers[0].name,
     selectedTerritory: undefined,
+    currentTurnOutstandingArmies:0
   };
 
   return context;

@@ -90,3 +90,41 @@ export function executeArmyMovementAgainstTerritoryStates(
   
     return [whatHappened, updatedPositions];
   }
+
+
+  export function addArmiesToTile(
+    currentPositions: TerritoryState[],
+    targetTerritory: CountryNameKey,
+    selectedArmies: number
+  ): [string, TerritoryState[]] {
+    let positions = currentPositions;
+  
+    let targetTerritoryState = positions.find(
+      (x) => x.territoryName === targetTerritory
+    );
+  
+    let updatedTargetTerritoryState;
+  
+    let whatHappened = "";
+  
+    if (
+      targetTerritoryState === undefined
+    )
+      return [whatHappened, positions];
+  
+      updatedTargetTerritoryState = {
+        ...targetTerritoryState,
+        armies: targetTerritoryState.armies + selectedArmies,
+      };
+  
+      whatHappened = `${targetTerritoryState.playerName} is adding ${selectedArmies} armies to ${targetTerritory}.`;
+
+  
+    let updatedPositions = positions.filter(
+      (x) =>
+        x.territoryName !== targetTerritory
+    );
+    updatedPositions.push(updatedTargetTerritoryState);
+  
+    return [whatHappened, updatedPositions];
+  }

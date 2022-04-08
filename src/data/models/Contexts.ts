@@ -18,6 +18,7 @@ const emptyContext: IGameContext = {
   currentTurn: "Player 1",
   roundStep: "Movement",
   selectedTerritory: undefined,
+  currentTurnOutstandingArmies:0
 };
 
 const emptyMapContext: ITileContext = {
@@ -37,6 +38,7 @@ const emptyMapContext: ITileContext = {
   selectedTerritory: undefined,
   applyArmies: (x, y) => {},
   onClick: (x) => {},
+  currentTurnOutstandingArmies:0
 };
 
 export const GameContext = React.createContext<IGameContext>(emptyContext);
@@ -49,6 +51,7 @@ export interface IGameContext {
   currentPlayers: [Player, Player];
   currentPositions: TerritoryState[];
   currentTurn: string;
+  currentTurnOutstandingArmies: number;
   selectedTerritory: CountryNameKey | undefined;
 }
 

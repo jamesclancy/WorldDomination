@@ -147,6 +147,8 @@ const TerritoryTile = (props: ITerritoryProps) => {
         return "#E6C78E";
       case "Select":
         return "#8EE698";
+      case "AddArmies":
+        return "#6CC476"
     }
   };
 
