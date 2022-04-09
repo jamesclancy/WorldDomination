@@ -1,6 +1,6 @@
 import { ITerritoryProps } from "../../components/TerritoryTile";
 import { IGameContext, ITileContext } from "./Contexts";
-import {
+import GameMap, {
   Continent,
   ContinentNameKey,
   CountryNameKey,
@@ -10,18 +10,27 @@ import {
 } from "./GameMap";
 import { TerritoryState } from "./GameState";
 
-export function getTerritoryFromContext(
-  context: IGameContext,
-  name: CountryNameKey
+function getTerritoryFromContext(
+  gameMap: GameMap,
+  name: string
 ): Territory | undefined {
-  return context.currentMap.territories.find((x) => x.name === name);
+  return gameMap.territories.find((x) => x.name === name);
 }
 
-export function getContinentFromContext(
-  context: IGameContext,
+function getContinentFromContext(
+  gameMap: GameMap,
   name: ContinentNameKey
 ): Continent | undefined {
-  return context.currentMap.continents.find((x) => x.name === name);
+  return gameMap.continents.find((x) => x.name === name);
+}
+
+export function getCountryForTerritory(
+  gameMap: GameMap,
+  territoryName: string
+): Continent | undefined {
+  const terr = getTerritoryFromContext(gameMap, territoryName);
+  if (!terr) return undefined;
+  return getContinentFromContext(gameMap, terr.continentName);
 }
 
 export function getTerritoryStateFromContext(
@@ -111,7 +120,7 @@ export function buildTerritoryPropsForTile(
   let worldMapContext = context;
 
   const territory: Territory | undefined = getTerritoryFromContext(
-    worldMapContext,
+    worldMapContext.currentMap,
     name
   );
 
@@ -120,7 +129,7 @@ export function buildTerritoryPropsForTile(
   }
 
   const continent: Continent | undefined = getContinentFromContext(
-    worldMapContext,
+    worldMapContext.currentMap,
     territory.continentName
   );
 
@@ -150,20 +159,18 @@ export function buildTerritoryPropsForTile(
     undefined,
   ];
 
-
   let remainingArmiesToAdd = context.currentTurnOutstandingArmies;
-  let possibleArmiesToApply = 
-    (actions === "AddArmies") ? remainingArmiesToAdd
-      : (selectedTerritoryState === undefined
+  let possibleArmiesToApply =
+    actions === "AddArmies"
+      ? remainingArmiesToAdd
+      : selectedTerritoryState === undefined
       ? 0
-      : selectedTerritoryState?.armies - 1 ?? 0);
-
-
+      : selectedTerritoryState?.armies - 1 ?? 0;
 
   let props: ITerritoryProps = {
     continent: continent,
     territory: territory,
-    possibleArmiesToApply:possibleArmiesToApply,
+    possibleArmiesToApply: possibleArmiesToApply,
     armies: territoryState?.armies ?? 0,
     potentialActions: actions,
     isTerritorySelected: isSelected,
@@ -176,25 +183,6 @@ export function buildTerritoryPropsForTile(
   return props;
 }
 
-export function getTileClass(continentName: ContinentNameKey) {
-  switch (continentName) {
-    case "NorthAmerica":
-      return `northAmericaTile`;
-    case "SouthAmerica":
-      return `southAmericaTile`;
-    case "Europe":
-      return `europeTile`;
-    case "Asia":
-      return `africaTile`;
-    case "Africa":
-      return `asiaTile`;
-    case "Oceania":
-      return `oceaniaTile`;
-    default:
-      return `idkTile`;
-  }
-}
-
 function getSelectedTerritory(
   worldMapContext: ITileContext
 ): [Territory | undefined, TerritoryState | undefined] {
@@ -202,7 +190,7 @@ function getSelectedTerritory(
     return [undefined, undefined];
 
   var territory = getTerritoryFromContext(
-    worldMapContext,
+    worldMapContext.currentMap,
     worldMapContext.selectedTerritory
   );
   var territoryState = getTerritoryStateFromContext(

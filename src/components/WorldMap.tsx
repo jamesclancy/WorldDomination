@@ -25,6 +25,7 @@ import WorldMapControlPanel from "./WorldMapControlPanel";
 const WorldMap = () => {
   let gameContext = useContext<IGameContext>(GameContext);
   const initialState: IWorldMapState = {
+    currentMap: gameContext.currentMap,
     currentPlayers: gameContext.currentPlayers,
     currentTurn: gameContext.currentPlayers[0].name,
     currentPositions: gameContext.currentPositions,
@@ -35,7 +36,7 @@ const WorldMap = () => {
       (x) => x.name
     ).slice(1),
     armiesToApply: [],
-    roundCounter: 0,
+    roundCounter: 0
   };
 
   let [state, dispatch] = useReducer(worldMapReducer, initialState);

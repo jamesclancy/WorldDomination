@@ -53,6 +53,7 @@ export type CountryNameKey =
 export type Continent = {
   name: ContinentNameKey;
   displayName: string;
+  bonusValue: number;
 };
 
 export type Territory = {
