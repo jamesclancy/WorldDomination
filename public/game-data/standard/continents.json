@@ -1,26 +1,32 @@
 [
   {
     "name": "NorthAmerica",
-    "displayName": "North America"
+    "displayName": "North America",
+    "bonusValue": 5
   },
   {
     "name": "SouthAmerica",
-    "displayName": "South America"
+    "displayName": "South America",
+    "bonusValue": 2
   },
   {
     "name": "Europe",
-    "displayName": "Europe"
+    "displayName": "Europe",
+    "bonusValue": 5
   },
   {
     "name": "Asia",
-    "displayName": "Asia"
+    "displayName": "Asia",
+    "bonusValue": 7
   },
   {
     "name": "Africa",
-    "displayName": "Africa"
+    "displayName": "Africa",
+    "bonusValue": 3
   },
   {
     "name": "Oceania",
-    "displayName": "Oceania"
+    "displayName": "Oceania",
+    "bonusValue": 2
   }
 ]

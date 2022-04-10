@@ -29,10 +29,7 @@ function App() {
     loadMapData();
   }, []);
 
-  let startGame = (
-    territories: TerritoryState[],
-    players: [Player, Player]
-  ) => {
+  let startGame = (territories: TerritoryState[], players: [Player, Player]) => {
     dispatch({
       type: "PositionsSelected",
       startingPositions: territories,
@@ -51,12 +48,7 @@ function App() {
           </>
         );
       case "TerritorySelect":
-        return (
-          <TerritorySelect
-            Territories={state.currentContext.currentMap.territories}
-            onStartGame={startGame}
-          />
-        );
+        return <TerritorySelect Territories={state.currentContext.currentMap.territories} onStartGame={startGame} />;
       case "WorldMap":
         return <WorldMap />;
     }
@@ -98,11 +90,7 @@ interface IAppStateAction {
 }
 
 const appStateReducer = (state: IAppState, action: IAppStateAction) => {
-  if (
-    action.type === "PositionsSelected" &&
-    action.players !== undefined &&
-    action.startingPositions !== undefined
-  ) {
+  if (action.type === "PositionsSelected" && action.players !== undefined && action.startingPositions !== undefined) {
     const newState: IAppState = {
       currentPage: "WorldMap",
       startingPositions: action.startingPositions,

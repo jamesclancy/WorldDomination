@@ -16,4 +16,4 @@ export type GameState = {
   onClickTerritory(territoryName: string): void;
 };
 
-export type RoundStepType = "AddArmies" | "Movement";
+export type RoundStepType = "AddArmies" | "Attack" | "Movement";

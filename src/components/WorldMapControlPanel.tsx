@@ -1,10 +1,7 @@
 import { Menu, MenuItem } from "@blueprintjs/core";
 import { useContext } from "react";
 import { ITileContext, WorldMapContext } from "../data/models/Contexts";
-import {
-  CountryNameKey,
-  TerritoryPotentialActions,
-} from "../data/models/GameMap";
+import { CountryNameKey, TerritoryPotentialActions } from "../data/models/GameMap";
 import { getPotentialActionsForTerritory } from "../data/models/Selectors";
 
 interface IWorldMapControlPanelProps {
@@ -50,11 +47,7 @@ export const WorldMapControlPanel = (props: IWorldMapControlPanelProps) => {
 
   if (worldMapContext.selectedTerritory !== undefined)
     possibleActions.push(
-      <MenuItem
-        onClick={props.clearSelectedTerritory}
-        text="Clear Selection"
-        icon="clean"
-      ></MenuItem>
+      <MenuItem onClick={props.clearSelectedTerritory} text="Clear Selection" icon="clean"></MenuItem>
     );
 
   let movements = <Menu>{possibleActions}</Menu>;

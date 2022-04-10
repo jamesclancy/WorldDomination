@@ -16,9 +16,9 @@ const emptyContext: IGameContext = {
   ],
   currentPositions: [],
   currentTurn: "Player 1",
-  roundStep: "Movement",
+  roundStep: "Attack",
   selectedTerritory: undefined,
-  currentTurnOutstandingArmies:0
+  currentTurnOutstandingArmies: 0,
 };
 
 const emptyMapContext: ITileContext = {
@@ -38,12 +38,11 @@ const emptyMapContext: ITileContext = {
   selectedTerritory: undefined,
   applyArmies: (x, y) => {},
   onClick: (x) => {},
-  currentTurnOutstandingArmies:0
+  currentTurnOutstandingArmies: 0,
 };
 
 export const GameContext = React.createContext<IGameContext>(emptyContext);
-export const WorldMapContext =
-  React.createContext<ITileContext>(emptyMapContext);
+export const WorldMapContext = React.createContext<ITileContext>(emptyMapContext);
 
 export interface IGameContext {
   currentMap: GameMap;

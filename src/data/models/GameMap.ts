@@ -1,11 +1,5 @@
 export type TerritoryPotentialActions = "None" | "Move" | "Attack" | "Select" | "AddArmies";
-export type ContinentNameKey =
-  | "NorthAmerica"
-  | "SouthAmerica"
-  | "Europe"
-  | "Asia"
-  | "Africa"
-  | "Oceania";
+export type ContinentNameKey = "NorthAmerica" | "SouthAmerica" | "Europe" | "Asia" | "Africa" | "Oceania";
 export type CountryNameKey =
   | "Alaska"
   | "NorthWesternTerritory"

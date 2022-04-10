@@ -31,31 +31,20 @@ interface ITerritorySelectAction {
   rowIndex?: number;
 }
 
-const territorySelectReducer = (
-  state: ITerritorySelectState,
-  action: ITerritorySelectAction
-) => {
+const territorySelectReducer = (state: ITerritorySelectState, action: ITerritorySelectAction) => {
   switch (action.type) {
     case "Randomize":
       return setRandomDataSet(state);
     case "UpdatePlayer1Name":
       if (!action.newValue) return state;
       return {
-        ...attemptToUpdatePlayerNameInTable(
-          state,
-          state.player1Name,
-          action.newValue
-        ),
+        ...attemptToUpdatePlayerNameInTable(state, state.player1Name, action.newValue),
         player1Name: action.newValue,
       };
     case "UpdatePlayer2Name":
       if (!action.newValue) return state;
       return {
-        ...attemptToUpdatePlayerNameInTable(
-          state,
-          state.player2Name,
-          action.newValue
-        ),
+        ...attemptToUpdatePlayerNameInTable(state, state.player2Name, action.newValue),
         player2Name: action.newValue,
       };
     case "UpdatePlayerInTable":
@@ -63,10 +52,7 @@ const territorySelectReducer = (
       return updateTableForValue(
         state,
         action.newValue,
-        action.newValue === state.player1Name ||
-          action.newValue === state.player2Name
-          ? Intent.NONE
-          : Intent.DANGER,
+        action.newValue === state.player1Name || action.newValue === state.player2Name ? Intent.NONE : Intent.DANGER,
         action.rowIndex,
         2
       );
@@ -85,19 +71,9 @@ const territorySelectReducer = (
 };
 
 const TerritorySelect = (props: ITerritorySelectProps) => {
-  let initData = props.Territories.map((x) => [
-    x.continentName,
-    x.name,
-    "",
-    "0",
-  ]);
+  let initData = props.Territories.map((x) => [x.continentName, x.name, "", "0"]);
 
-  let startingIntents = props.Territories.map((x) => [
-    Intent.NONE,
-    Intent.NONE,
-    Intent.NONE,
-    Intent.NONE,
-  ]);
+  let startingIntents = props.Territories.map((x) => [Intent.NONE, Intent.NONE, Intent.NONE, Intent.NONE]);
 
   const initialState: ITerritorySelectState = {
     cellIntents: startingIntents,
@@ -144,14 +120,11 @@ const TerritorySelect = (props: ITerritorySelectProps) => {
     return <Cell>{`${state.dataForTable[rowIndex][columnIndex]}`}</Cell>;
   };
 
-  const columns = [
-    "Continent",
-    "Territory",
-    "Owner",
-    "AdditionalArmiesToPlace",
-  ].map((element: string, index: number) => {
-    return <Column key={index} name={element} cellRenderer={cellRenderer} />;
-  });
+  const columns = ["Continent", "Territory", "Owner", "AdditionalArmiesToPlace"].map(
+    (element: string, index: number) => {
+      return <Column key={index} name={element} cellRenderer={cellRenderer} />;
+    }
+  );
 
   const submitData = () => {
     var results: TerritoryState[] = [];
@@ -186,11 +159,7 @@ const TerritorySelect = (props: ITerritorySelectProps) => {
     dispatch({ type: "UpdatePlayer2Name", newValue: newValue });
   };
 
-  const changeArmies = (
-    value: string,
-    rowIndex: number | undefined,
-    columnIndex: number | undefined
-  ) => {
+  const changeArmies = (value: string, rowIndex: number | undefined, columnIndex: number | undefined) => {
     dispatch({
       type: "UpdateArmiesInTable",
       newValue: value,
@@ -198,11 +167,7 @@ const TerritorySelect = (props: ITerritorySelectProps) => {
     });
   };
 
-  const changePlayer = (
-    value: string,
-    rowIndex: number | undefined,
-    columnIndex: number | undefined
-  ) => {
+  const changePlayer = (value: string, rowIndex: number | undefined, columnIndex: number | undefined) => {
     dispatch({
       type: "UpdatePlayerInTable",
       newValue: value,
@@ -214,20 +179,8 @@ const TerritorySelect = (props: ITerritorySelectProps) => {
     <>
       <Card>
         <H3>Player Names</H3>
-        <InputGroup
-          disabled={false}
-          large={true}
-          value={state.player1Name}
-          type="text"
-          onChange={player1NameUpdated}
-        />
-        <InputGroup
-          disabled={false}
-          large={true}
-          value={state.player2Name}
-          type="text"
-          onChange={player2NameUpdated}
-        />
+        <InputGroup disabled={false} large={true} value={state.player1Name} type="text" onChange={player1NameUpdated} />
+        <InputGroup disabled={false} large={true} value={state.player2Name} type="text" onChange={player2NameUpdated} />
       </Card>
       <Card>
         <H3>Territory Select</H3>
@@ -267,9 +220,7 @@ const setRandomDataSet = (state: ITerritorySelectState) => {
     .map((x, index) => ({
       value: index % 2 === 0 ? state.player1Name : state.player2Name,
       sort: Math.random(),
-      armiesToApply: armiesToApply(
-        index % 2 === 0 ? state.player1Name : state.player2Name
-      ),
+      armiesToApply: armiesToApply(index % 2 === 0 ? state.player1Name : state.player2Name),
     }))
     .sort((x) => x.sort);
 
@@ -296,11 +247,7 @@ const setRandomDataSet = (state: ITerritorySelectState) => {
   return { ...state, canSubmitData: true, dataForTable: updatedDataForTable };
 };
 
-const attemptToUpdatePlayerNameInTable = (
-  state: ITerritorySelectState,
-  preName: string,
-  newName: string
-) => {
+const attemptToUpdatePlayerNameInTable = (state: ITerritorySelectState, preName: string, newName: string) => {
   let updatedDataForTable = state.dataForTable;
 
   state.dataForTable.forEach((element, row) => {
@@ -326,9 +273,7 @@ const updateTableForValue = (
       });
     });
 
-    const totalArmies = state.dataForTable
-      .map((x) => x[3])
-      .reduce((x, y) => x + parseInt(y), 0);
+    const totalArmies = state.dataForTable.map((x) => x[3]).reduce((x, y) => x + parseInt(y), 0);
 
     if (totalArmies !== 80) return false;
 

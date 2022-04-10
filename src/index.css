@@ -73,3 +73,13 @@ path {
 .gamePanel .row {
   margin-top: 50px;
 }
+
+.progressNavbarOff {
+  color: #5f6b7c;
+}
+
+.progressNavbarOn {
+  color: #165a36;
+  text-decoration: underline;
+  text-decoration-style: wavy;
+}

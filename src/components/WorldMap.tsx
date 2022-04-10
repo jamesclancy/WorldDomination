@@ -1,23 +1,8 @@
-import {
-  H6,
-  Navbar,
-  NavbarDivider,
-  NavbarGroup,
-  NavbarHeading,
-  TextArea,
-} from "@blueprintjs/core";
+import { Button, Classes, H6, Navbar, NavbarDivider, NavbarGroup, NavbarHeading, TextArea } from "@blueprintjs/core";
 import { useContext, useEffect, useReducer } from "react";
-import {
-  GameContext,
-  IGameContext,
-  ITileContext,
-  WorldMapContext,
-} from "../data/models/Contexts";
+import { GameContext, IGameContext, ITileContext, WorldMapContext } from "../data/models/Contexts";
 import { CountryNameKey } from "../data/models/GameMap";
-import {
-  IWorldMapState,
-  worldMapReducer,
-} from "../data/services/WorldStateTransformers";
+import { IWorldMapState, worldMapReducer } from "../data/services/WorldStateTransformers";
 import { NamedTerritoryTile } from "./TerritoryTile";
 
 import WorldMapControlPanel from "./WorldMapControlPanel";
@@ -31,12 +16,10 @@ const WorldMap = () => {
     currentPositions: gameContext.currentPositions,
     selectedTerritory: undefined,
     history: "Game Started",
-    roundStep: "Movement",
-    roundStepRemainingPlayerTurns: gameContext.currentPlayers.map(
-      (x) => x.name
-    ).slice(1),
+    roundStep: "Attack",
+    roundStepRemainingPlayerTurns: gameContext.currentPlayers.map((x) => x.name).slice(1),
     armiesToApply: [],
-    roundCounter: 0
+    roundCounter: 0,
   };
 
   let [state, dispatch] = useReducer(worldMapReducer, initialState);
@@ -65,11 +48,16 @@ const WorldMap = () => {
     roundStep: state.roundStep,
     onClick: trySelectTerritory,
     applyArmies: applyArmies,
-    currentTurnOutstandingArmies: state.armiesToApply.find(x=>x.playerName === state.currentTurn)?.numberOfArmiesRemaining ?? 0
+    currentTurnOutstandingArmies:
+      state.armiesToApply.find((x) => x.playerName === state.currentTurn)?.numberOfArmiesRemaining ?? 0,
   };
 
   let clearSelectedTerritory = () => {
     dispatch({ type: "ClearSelection" });
+  };
+
+  let moveNextStep = () => {
+    dispatch({ type: "MoveToNextStep" });
   };
 
   return (
@@ -82,23 +70,24 @@ const WorldMap = () => {
       </Navbar>
       <WorldMapContext.Provider value={propsToAddToEachTile}>
         <div className="fx-grd bottomControlPanel">
-          <div
-            className="row"
-            style={{
-              borderBottom: 3,
-              borderBottomStyle: "solid",
-              borderBottomColor: "#333",
-            }}
-          >
-            <div className="col-3 col">
-              <H6 muted={state.roundStep !== "AddArmies"}>Planning Phase</H6>
-              {state.roundStep === "AddArmies" && state.roundStepRemainingPlayerTurns}
-            </div>
-            <div className="col-3 col">
-              <H6 muted={state.roundStep !== "Movement"}>Attack Phase</H6>
-              {state.roundStep === "Movement" && state.roundStepRemainingPlayerTurns}
-            </div>
-          </div>
+          <Navbar>
+            <NavbarGroup align="left">
+              <NavbarHeading className={state.roundStep !== "AddArmies" ? "progressNavbarOff" : "progressNavbarOn"}>
+                Planning Phase
+              </NavbarHeading>
+              <NavbarHeading className={state.roundStep !== "Attack" ? "progressNavbarOff" : "progressNavbarOn"}>
+                Attack Phase
+              </NavbarHeading>
+              <NavbarHeading className={state.roundStep !== "Movement" ? "progressNavbarOff" : "progressNavbarOn"}>
+                Reallocate Phase
+              </NavbarHeading>
+            </NavbarGroup>
+            <NavbarGroup align="right">
+              <Button className={Classes.MINIMAL} onClick={moveNextStep}>
+                End Turn
+              </Button>
+            </NavbarGroup>
+          </Navbar>
           <div className="row">
             <div
               className="col-2 col"

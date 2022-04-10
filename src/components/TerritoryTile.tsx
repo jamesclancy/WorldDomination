@@ -1,6 +1,6 @@
 import { Button, Dialog, H5, Intent, Slider } from "@blueprintjs/core";
 import { Classes } from "@blueprintjs/popover2";
-import { useContext, useReducer } from "react";
+import { useContext, useEffect, useReducer } from "react";
 import { ITileContext, WorldMapContext } from "../data/models/Contexts";
 import {
   Continent,
@@ -52,10 +52,7 @@ interface ITerritoryStateAction {
   armyCount?: number;
 }
 
-const territoryStateReducer = (
-  state: ITerritoryState,
-  action: ITerritoryStateAction
-) => {
+const territoryStateReducer = (state: ITerritoryState, action: ITerritoryStateAction) => {
   switch (action.type) {
     case "Cancel":
       return { ...state, showPopover: false };
@@ -69,11 +66,15 @@ const territoryStateReducer = (
 };
 
 const TerritoryTile = (props: ITerritoryProps) => {
-  let initialState: ITerritoryState = { showPopover: false, selectedArmies: 1 };
+  let initialState: ITerritoryState = { showPopover: false, selectedArmies: props.possibleArmiesToApply };
   let [state, dispatch] = useReducer(territoryStateReducer, initialState);
 
   const isSelected = props.isTerritorySelected;
   const isClickable = props.potentialActions !== "None";
+
+  useEffect(() => {
+    dispatch({ type: "SelectArmies", armyCount: props.possibleArmiesToApply });
+  }, [props]);
 
   function click() {
     if (isClickable) props.select();
@@ -95,9 +96,7 @@ const TerritoryTile = (props: ITerritoryProps) => {
   let popOverContent = () => {
     let slider =
       props.possibleArmiesToApply === 1 ? (
-        <>
-          <p>Are you sure you want to use your only spare army?</p>
-        </>
+        <p>Are you sure you want to use your only spare army?</p>
       ) : (
         <>
           <p>Select armies to move.</p>
@@ -115,21 +114,11 @@ const TerritoryTile = (props: ITerritoryProps) => {
       <div className="popOverSelector">
         <H5>Confirm {props.potentialActions}</H5>
         {slider}
-        <div
-          style={{ display: "flex", justifyContent: "flex-end", marginTop: 15 }}
-        >
-          <Button
-            className={Classes.POPOVER2_DISMISS}
-            style={{ marginRight: 10 }}
-            onClick={togglePopover}
-          >
+        <div style={{ display: "flex", justifyContent: "flex-end", marginTop: 15 }}>
+          <Button className={Classes.POPOVER2_DISMISS} style={{ marginRight: 10 }} onClick={togglePopover}>
             Cancel
           </Button>
-          <Button
-            intent={Intent.DANGER}
-            className={Classes.POPOVER2_DISMISS}
-            onClick={applyArmies}
-          >
+          <Button intent={Intent.DANGER} className={Classes.POPOVER2_DISMISS} onClick={applyArmies}>
             Confirm
           </Button>
         </div>
@@ -148,7 +137,7 @@ const TerritoryTile = (props: ITerritoryProps) => {
       case "Select":
         return "#8EE698";
       case "AddArmies":
-        return "#6CC476"
+        return "#6CC476";
     }
   };
 
